@@ -24,9 +24,14 @@ def registerPage(request):
             user = form.save()
             username = form.cleaned_data.get('username')
 
-            # automatically register new user in customer group
+            # automatically register/add new user in customer group
             group = Group.objects.get(name='Customer')
             user.groups.add(group)
+
+            # associate user user profile
+            Customer.objects.create(
+                user=user
+            )
 
             messages.success(request, 'Account registered for ' + username)
 
@@ -77,8 +82,19 @@ def home(request):
     return render(request, 'dashboard.html', context)
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles='Customer')
 def userPage(request):
-    context = {}
+    orders = request.user.customer.order_set.all()
+
+    total_orders = orders.count()
+    delivered = orders.filter(status='Delivered').count()
+    pending = orders.filter(status='Pending').count()
+
+    context = {
+        'orders': orders, 'total_orders': total_orders,
+        'delivered': delivered, 'pending': pending
+    }
     return render(request, 'user.html', context)
 
 
