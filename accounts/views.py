@@ -28,7 +28,7 @@ def registerPage(request):
             group = Group.objects.get(name='Customer')
             user.groups.add(group)
 
-            # associate user user profile
+            # associate registered user to their profile
             Customer.objects.create(
                 user=user
             )
@@ -83,7 +83,7 @@ def home(request):
 
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles='Customer')
+@allowed_users(allowed_roles=['Customer'])
 def userPage(request):
     orders = request.user.customer.order_set.all()
 
@@ -96,6 +96,22 @@ def userPage(request):
         'delivered': delivered, 'pending': pending
     }
     return render(request, 'user.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Customer'])
+def accountSettings(request):
+    customa = request.user.customer
+    form = CustomerForm(instance=customa)
+
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, request.FILES, instance=customa)
+
+        if form.is_valid():
+            form.save()
+
+    context = {'form': form}
+    return render(request, 'account_settings.html', context)
 
 
 @login_required(login_url='login')
