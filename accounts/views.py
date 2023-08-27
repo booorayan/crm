@@ -25,13 +25,13 @@ def registerPage(request):
             username = form.cleaned_data.get('username')
 
             # automatically register/add new user in customer group
-            group = Group.objects.get(name='Customer')
-            user.groups.add(group)
+            # group = Group.objects.get(name='Customer')
+            # user.groups.add(group)
 
             # associate registered user to their profile
-            Customer.objects.create(
-                user=user
-            )
+            # Customer.objects.create(
+            #     user=user
+            # )
 
             messages.success(request, 'Account registered for ' + username)
 
